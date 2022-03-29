@@ -1,4 +1,4 @@
-# rcat
+# winssh
 
 Spawns a ssh server on windows. No installation required.
 Based on https://github.com/PowerShell/Win32-OpenSSH/
