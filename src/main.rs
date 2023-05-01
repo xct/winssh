@@ -48,13 +48,13 @@ fn main() {
     let tmp_abs = Path::new(&tmp).canonicalize().unwrap().display().to_string();
     let tmp_as = &tmp_abs[4..tmp_abs.len()]; // remove \\?\
     let config = format!("Port {}\n\
-        ListenAddress 0.0.0.0\n\
+        ListenAddress 127.0.0.1\n\
         HostKey {}\\host_rsa\n\
         HostKey {}\\host_dsa\n\
         PubkeyAuthentication yes\n\
         AuthorizedKeysFile {}\\authorized_keys\n\
-        PasswordAuthentication yes\n\
-        PermitEmptyPasswords yes\n\
+        # PasswordAuthentication yes\n\
+        # PermitEmptyPasswords yes\n\
         GatewayPorts yes\n\
         PidFile {}\\sshd.pid\n\
         Subsystem	sftp	sftp-server.exe\n\
