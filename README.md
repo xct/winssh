@@ -9,6 +9,7 @@ When launched without arguments, `winssh.exe` default to start an OpenSSH server
 You can specify a port using:
 ```
 winssh.exe --port <port>
+```
 
 You can also specify a server to connect back to using:
 
