@@ -14,9 +14,9 @@ struct Asset;
 #[clap(name="winssh.exe", author="xct (@xct_de)", version="0.1", about="simple ssh server on windows", long_about = None)]
 #[clap(propagate_version = true)]
 struct Cli {
-    #[clap(short, long)]
+    #[clap(short, long, default_value_t = 8022)] 
     port: u16,
-    #[clap(short, long)]
+    #[clap(short, long, default_value = "CHANGEME")]
     server: String
 }
 
@@ -67,11 +67,12 @@ fn main() {
 
     let path = Path::new(&tmp).join("sshd_config");
     fs::write(&path, config).unwrap();
-    // create the tunnel and remote port forward
-    println!("Creating reverse port forward for port {}",port);
-    let rev = format!("Push-Location {}; ssh -i {}\\key-reverse -R {}:127.0.0.1:{} root@{} ;",tmp_as, tmp_as, port,port,remote_server );
-    Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).spawn();
-
+    if remote_server.ne("CHANGEME") {
+        // create the tunnel and remote port forward
+        println!("Creating reverse port forward for port {}",port);
+        let rev = format!("Push-Location {}; ssh -i {}\\key-reverse -R {}:127.0.0.1:{} root@{:?} ;",tmp_as, tmp_as, port,port,remote_server );
+        Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).spawn();
+    }
     // start server
     let cmd = format!("Push-Location {}; .\\sshd.exe -f {}\\sshd_config -E {}\\log.txt -d; Pop-Location", tmp_as, tmp_as, tmp_as );
     println!("Running SSH-Server on port {}", port);
