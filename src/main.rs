@@ -72,8 +72,8 @@ fn main() {
     fs::write(&path, config).unwrap();
     if tunnel_server.ne("CHANGEME") {
         // create the tunnel and remote port forward
-        println!("Creating reverse port forward for port {} on server {:?} as user {:?}",port,tunnel_server,tunnel_user);
-        let rev = format!("Push-Location {}; ssh -i {}\\key-reverse -R {}:127.0.0.1:{} {:?}@{:?} ;",tmp_as, tmp_as, port,port,tunnel_user, tunnel_server );
+        println!("Creating reverse port forward for port {} on server {} as user {}",port,tunnel_server,tunnel_user);
+        let rev = format!("Push-Location {}; ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -i {}\\key-reverse -R {}:127.0.0.1:{} {}@{} ;",tmp_as, tmp_as, port,port,tunnel_user, tunnel_server );
         Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).spawn();
     }
     // start server
