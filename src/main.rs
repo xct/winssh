@@ -17,16 +17,20 @@ struct Cli {
     #[clap(short, long, default_value_t = 8022)] 
     port: u16,
     #[clap(short, long, default_value = "CHANGEME")]
-    server: String,
+    tunnel_server: String,
+    #[clap(short, long, default_value_t = 22 )]
+    tunnel_port: u16,
     #[clap(short, long, default_value = "tunnel")]
-    user: String
+    tunnel_user: String
+
 }
 
 fn main() {
     let cli = Cli::parse();    
     let port = cli.port;
-    let tunnel_server = cli.server;
-    let tunnel_user = cli.user;
+    let tunnel_server = cli.tunnel_server;
+    let tunnel_port =cli.tunnel_port;
+    let tunnel_user = cli.tunnel_user;
 
     let rs: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -73,7 +77,7 @@ fn main() {
     if tunnel_server.ne("CHANGEME") {
         // create the tunnel and remote port forward
         println!("Creating reverse port forward for port {} on server {} as user {}",port,tunnel_server,tunnel_user);
-        let rev = format!("Push-Location {}; ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -i {}\\key-reverse -R {}:127.0.0.1:{} {}@{} ;",tmp_as, tmp_as, port,port,tunnel_user, tunnel_server );
+        let rev = format!("Push-Location {}; ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -i {}\\key-reverse -R {}:127.0.0.1:{} -p {} {}@{} ;",tmp_as, tmp_as, port,port,tunnel_port,tunnel_user, tunnel_server );
         Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).spawn();
     }
     // start server
