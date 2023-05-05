@@ -3,12 +3,10 @@ name = "winssh"
 version = "0.1.0"
 edition = "2018"
 
-
 [dependencies]
 clap = { version = "3.1.0", features = ["derive"] }
 rust-embed="6.3.0"
 rand = "*"
-whoami = "1.2.1"
 
 [profile.release]
 opt-level = "s"

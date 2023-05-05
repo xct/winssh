@@ -13,7 +13,7 @@ fn main() {
         .status()
         .unwrap();
     Command::new("sh").arg("-c")
-        .arg("yes 'y' 2>/dev/null | ssh-keygen -t ed25519 -f files/key-reverse -q -N \"\"")
+        .arg("yes 'y' 2>/dev/null | ssh-keygen -t ed25519 -f files/key_reverse -q -N \"\"")
         .status()
         .unwrap();
      Command::new("sh").arg("-c")
