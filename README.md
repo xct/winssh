@@ -1,7 +1,6 @@
 # Winssh
 
-Spawns a ssh server on windows. No installation required.
-Based on https://github.com/PowerShell/Win32-OpenSSH/
+Spawns a ssh server on windows. No installation required. Based on https://github.com/PowerShell/Win32-OpenSSH/.
 
 ## Usage
 
@@ -51,4 +50,6 @@ To reduce the filesize further, you can strip the binaries with `strip`.
 
 ## Other
 
-If you want to run without any arguments modify the source to hardcode the default values for tunnel-server and both ports.
+If you want to run without any arguments modify the source to hardcode the default values for tunnel-server and both ports. To clean up you want to delete the temp directory in `\windows\temp` (random name) that has the ssh files.
+
+This is not opsec safe - it runs various powershell commands and leaves files in \temp. However it's currently not being flagged by AV/EDR. If you need it opsec safe you'll have to make some modifications.
